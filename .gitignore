@@ -3,6 +3,7 @@ Release
 build
 example1
 *.a
+.DS_Store
 
 /SQLiteCpp.sln
 *.ncb
