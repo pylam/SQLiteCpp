@@ -149,6 +149,10 @@ set(SQLITECPP_EXAMPLES
  examples/example1/main.cpp
 )
 source_group(example1 FILES ${SQLITECPP_EXAMPLES})
+set(SQLITECPP_EXAMPLES2
+ examples/example2/main.cpp
+)
+source_group(example2 FILES ${SQLITECPP_EXAMPLES2})
 
 # list of doc files of the library
 set(SQLITECPP_DOC
@@ -278,6 +282,24 @@ if (SQLITECPP_BUILD_EXAMPLES)
 else (SQLITECPP_BUILD_EXAMPLES)
     message(STATUS "SQLITECPP_BUILD_EXAMPLES OFF")
 endif (SQLITECPP_BUILD_EXAMPLES)
+
+option(SQLITECPP_BUILD_EXAMPLES2 "Build examples2." OFF)
+if (SQLITECPP_BUILD_EXAMPLES2)
+    # add the basic example executable
+    add_executable(SQLiteCpp_example2 ${SQLITECPP_EXAMPLES2})
+    target_link_libraries(SQLiteCpp_example2 SQLiteCpp sqlite3)
+    # Link target with pthread and dl for linux
+    if (UNIX)
+        target_link_libraries(SQLiteCpp_example2 pthread)
+        if (NOT APPLE)
+            target_link_libraries(SQLiteCpp_example2 dl)
+        endif ()
+    elseif (MSYS OR MINGW)
+        target_link_libraries(SQLiteCpp_example2 ssp)
+    endif ()
+else (SQLITECPP_BUILD_EXAMPLES2)
+    message(STATUS "SQLITECPP_BUILD_EXAMPLES2 OFF")
+endif (SQLITECPP_BUILD_EXAMPLES2)
 
 option(SQLITECPP_BUILD_TESTS "Build and run tests." OFF)
 if (SQLITECPP_BUILD_TESTS)

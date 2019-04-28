@@ -442,11 +442,15 @@ int main ()
             // Execute the one-step query to insert the blob
             int nb = query.exec();
             std::cout << "INSERT INTO test VALUES (NULL, ?)\", returned " << nb << std::endl;
+            query.reset();
+            SQLite::bind(query, 43, "fortythree");
+            nb = query.exec();
+            std::cout << "INSERT INTO test VALUES (NULL, ?)\", returned " << nb << std::endl;
         }
 
         SQLite::Statement query(db, "SELECT * FROM test");
         std::cout << "SELECT * FROM test :\n";
-        if (query.executeStep())
+        while (query.executeStep())
         {
             std::cout << query.getColumn(0).getInt() << "\t\"" << query.getColumn(1).getText() << "\"\n";
         }
