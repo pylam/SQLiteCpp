@@ -42,47 +42,9 @@ static inline std::string getExamplePath()
 
 /// Example Database
 static const std::string filename_example_db3 = getExamplePath() + "/example.db3";
-/// Image
-static const std::string filename_logo_png    = getExamplePath() + "/logo.png";
 
 
 /// Object Oriented Basic example
-class Example
-{
-public:
-    // Constructor
-    Example() :
-        mDb(filename_example_db3),                                  // Open a database file in readonly mode
-        mQuery(mDb, "SELECT * FROM test WHERE weight > :min_weight")// Compile a SQL query, containing one parameter (index 1)
-    {
-    }
-    virtual ~Example()
-    {
-    }
-
-    /// List the rows where the "weight" column is greater than the provided aParamValue
-    void ListGreaterThan (const int aParamValue)
-    {
-        std::cout << "ListGreaterThan (" << aParamValue << ")\n";
-
-        // Bind the integer value provided to the first parameter of the SQL query
-        mQuery.bind(":min_weight", aParamValue); // same as mQuery.bind(1, aParamValue);
-
-        // Loop to execute the query step by step, to get one a row of results at a time
-        while (mQuery.executeStep())
-        {
-            std::cout << "row (" << mQuery.getColumn(0) << ", \"" << mQuery.getColumn(1) << "\", " << mQuery.getColumn(2) << ")\n";
-        }
-
-        // Reset the query to be able to use it again later
-        mQuery.reset();
-    }
-
-private:
-    SQLite::Database    mDb;    ///< Database connection
-    SQLite::Statement   mQuery; ///< Database prepared SQL query
-};
-
 int main ()
 {
     // Using SQLITE_VERSION would require #include <sqlite3.h> which we want to avoid: use SQLite::VERSION if possible.
@@ -91,6 +53,10 @@ int main ()
     std::cout << "SQliteC++ version " << SQLITECPP_VERSION << std::endl;
 
     std::ifstream infile("/home/alan/Downloads/tmp/en-zh/UNv1.0.en-zh.en");
+    if ( infile.fail()) {
+	std::cout << "fail to open file"<<std::endl;
+  	return EXIT_FAILURE;
+    }
     std::string line;
     ////////////////////////////////////////////////////////////////////////////
     // Simple batch queries example (5/7) :
@@ -100,13 +66,12 @@ int main ()
         SQLite::Database    db("test.db3", SQLite::OPEN_READWRITE|SQLite::OPEN_CREATE);
         std::cout << "SQLite database file '" << db.getFilename().c_str() << "' opened successfully\n";
 
-        // Create a new table with an explicit "id" column aliasing the underlying rowid
         db.exec("DROP TABLE IF EXISTS en");
         db.exec("CREATE TABLE en (sentence TEXT)");
         SQLite::Statement query(db, "INSERT INTO en VALUES(?)");
 
         while (std::getline(infile,line)) {
-            SQLite::bind(query,line.c_str());
+            query.bindNoCopy(1,line);
             query.exec();
             query.reset();
         }

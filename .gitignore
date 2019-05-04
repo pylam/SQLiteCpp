@@ -5,6 +5,7 @@ example1
 example2
 *.a
 .DS_Store
+.*.swp
 
 /SQLiteCpp.sln
 *.ncb
